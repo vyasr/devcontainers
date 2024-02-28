@@ -172,6 +172,31 @@ _make_conda_dependencies() {
     readarray -t conda_env_yamls < <(_generate_env_yamls);
 
     if test ${#conda_env_yamls[@]} -gt 0; then
+        # Custom additions
+        ENV_ADDITIONS=/tmp/rapids-conda-env-additions.txt
+        cat <<EOF > "${ENV_ADDITIONS}"
+          channels:
+          - conda-forge
+          dependencies:
+          - nodejs>=17
+          - conda-forge/label/rust_dev::rust
+          - gdb
+          - htop
+          - maturin
+          - mkdocs
+          - nvim
+          - rattler-build
+          - ripgrep
+          - rust-src
+          - ruff
+          - ty
+          - vim
+          - pip:
+            - pynvim
+EOF
+
+        conda_env_yamls+=("${ENV_ADDITIONS}");
+
 
         readarray -t rapids_python_pkg_names < <(rapids-python-pkg-names);
         readarray -t rapids_python_conda_pkg_names < <(rapids-python-conda-pkg-names);

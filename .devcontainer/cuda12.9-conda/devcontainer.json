@@ -16,11 +16,25 @@
     "--name",
     "${localEnv:USER:anon}-rapids-${localWorkspaceFolderBasename}-26.10-cuda12.9-conda",
     "--ulimit",
-    "nofile=500000"
+    "nofile=500000",
+    "-p",
+    "8888:8888",
+    "--cap-add",
+    "SYS_ADMIN",
+    "--cap-add",
+    "SYS_PTRACE",
+    "--security-opt",
+    "seccomp=${localWorkspaceFolder}/docker-seccomp-with-perf.json"
   ],
-  "containerEnv": {"PYTHON_VERSION": "3.13"},
+  "containerEnv": {
+      "PYTHON_VERSION": "3.13",
+      "TERM": "${localEnv:TERM}",
+      "SSH_AUTH_SOCK": "/tmp/original_auth_sock",
+      "HOST_HOSTNAME": "${localEnv:HOST_HOSTNAME}"
+  },
   "hostRequirements": {"gpu": "optional"},
   "features": {
+    "./features/src/local-mods": {},
     "./features/src/cuda": {
       "version": "12.9",
       "installCompilers": false,
@@ -47,6 +61,7 @@
     "./features/src/rapids-build-utils": {}
   },
   "overrideFeatureInstallOrder": [
+    "./features/src/local-mods",
     "./features/src/cuda",
     "./features/src/utils",
     "./features/src/rapids-build-utils"
@@ -74,6 +89,7 @@
     "source=${localWorkspaceFolder}/../cuopt,target=/home/coder/cuopt,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.aws,target=/home/coder/.aws,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.cache,target=/home/coder/.cache,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/../.claude,target=/home/coder/.claude,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.config,target=/home/coder/.config,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.conda/pkgs,target=/home/coder/.conda/pkgs,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.conda/${localWorkspaceFolderBasename}-cuda12.9-envs,target=/home/coder/.conda/envs,type=bind,consistency=consistent",
@@ -86,7 +102,8 @@
       "extensions": [
         "augustocdias.tasks-shell-input",
         "ms-python.flake8",
-        "nvidia.nsight-vscode-edition"
+        "nvidia.nsight-vscode-edition",
+        "asvetliakov.vscode-neovim"
       ],
       "settings": {
         "files.watcherExclude": {

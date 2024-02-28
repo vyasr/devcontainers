@@ -1,0 +1,47 @@
+function! s:get_build_command()
+  silent! !git rev-parse --is-inside-work-tree
+  " Need to redraw after silent, see
+  " https://vim.fandom.com/wiki/Avoiding_the_%22Hit_ENTER_to_continue%22_prompts
+  redraw!
+  if v:shell_error != 0
+    throw "Not in git repository!"
+  endif
+
+  let l:git_root = system('git rev-parse --show-toplevel')
+  let l:git_root = substitute(l:git_root, '\n', '', '')
+  let l:current_file = expand('%:p')
+  let l:relative_path = substitute(l:current_file, l:git_root . '/', '', '')
+  let l:path_components = split(l:relative_path, '/')
+
+  let l:component = ''
+  let l:pkg = ''
+
+  if len(l:path_components) == 0
+    throw "Couldn't infer the path!"
+  endif
+
+  let l:component = l:path_components[0]
+  if l:component == 'python'
+    " For the Python package, the package can be inferred from the python/
+    " subdirectory.
+    if len(l:path_components) == 1
+      throw "Couldn't infer the package!"
+    endif
+    let l:pkg = l:path_components[1]
+  else
+    " For the C++ package, use the git remote to determine the name of the
+    " package in the build command.
+    let l:pkg = system("git remote -v | grep origin | grep fetch | awk '{print $2}' | cut -d '/' -f 2 | cut -d '.' -f 1")[:-2]
+  endif
+
+  return l:pkg . '-' . l:component
+endfunction
+
+command! BuildRapids execute 'AsyncRun build-' . s:get_build_command()
+command! BuildRapidsRaw execute 'AsyncRun -raw build-' . s:get_build_command()
+command! CleanRapids execute 'AsyncRun clean-' . s:get_build_command()
+
+nmap <leader>bb :BuildRapidsRaw<CR>
+
+set errorformat^=%-Gwarning:\ %f:%l:%c:%.%#\ redeclared%.%#  " Ignore Cython warnings about use of unscoped enums
+set errorformat^=%-G%f:%l:\ UserWarning:\ Normalizing%.%#  " Ignore versioneer version normalization
