@@ -1,0 +1,31 @@
+{
+  "name": "Vyas's Local Modifications",
+  "id": "local-mods",
+  "version": "24.2.0",
+  "description": "Local modifications to the default configuration",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        ""
+      ],
+      "default": "",
+      "description": "Version of the configuration to use"
+    }
+  },
+  "mounts": [
+    "source=${localEnv:HOME}/.gitconfig,target=/home/coder/.gitconfig.default,type=bind,consistency=consistent",
+    "source=${localEnv:HOME}/local/dotfiles,target=/home/coder/local/dotfiles,type=bind,consistency=consistent",
+    "source=${localEnv:HOME}/.ssh/auth_sock,target=/tmp/auth_sock,type=bind,consistency=consistent",
+    "source=${localEnv:HOME}/.local/share/fonts,target=/home/coder/.local/share/fonts,type=bind,consistency=consistent",
+    "source=${localEnv:HOME}/.p10k.zsh,target=/home/coder/.p10k.zsh,type=bind,consistency=consistent",
+    "source=${localEnv:HOME}/.gdbinit,target=/home/coder/.gdbinit,type=bind,consistency=consistent",
+    "source=${localEnv:SSH_AUTH_SOCK},target=/tmp/original_auth_sock,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/../.vim,target=/home/coder/.vim,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/../.fzf.zsh,target=/home/coder/.fzf.zsh,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/../.fzf.bash,target=/home/coder/.fzf.bash,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/../local,target=/home/coder/local,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/.lvimrc,target=/home/coder/.lvimrc,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/.zshrc,target=/home/coder/.zshrc,type=bind,consistency=consistent"
+  ]
+}

@@ -128,13 +128,17 @@ find /opt/devcontainer \
 
 # Enable GCC colors
 for_each_user_bashrc 'sed -i -re "s/^#(export GCC_COLORS)/\1/g" "$0"';
+for_each_user_zshrc 'sed -i -re "s/^#(export GCC_COLORS)/\1/g" "$0"';
 
 # Unlimited history size
 for_each_user_bashrc 'sed -i -re "s/^(HIST(FILE)?SIZE=).*$/\1/g" "$0"';
+for_each_user_zshrc 'sed -i -re "s/^(HIST(FILE)?SIZE=).*$/\1/g" "$0"';
 
 # export envvars in bashrc files
 append_to_etc_bashrc "$(cat .bashrc)";
 append_to_all_bashrcs "$(cat .bashrc)";
+append_to_etc_zshrc "$(cat .zshrc)";
+append_to_all_zshrcs "$(cat .zshrc)";
 
 # export envvars in /etc/profile.d
 add_etc_profile_d_script devcontainer-utils "$(cat .bashrc)";

@@ -154,6 +154,16 @@ make_conda_dependencies() {
     done
 
     if test ${#conda_env_yamls[@]} -gt 0; then
+        # Custom additions
+        ENV_ADDITIONS=/tmp/rapids-conda-env-additions.txt
+        echo -e "channels:\n  - conda-forge" > "${ENV_ADDITIONS}";
+        echo -e "dependencies:" >> "${ENV_ADDITIONS}";
+        for dep in vim "nodejs>=17" htop conda-forge/label/rust_dev::rust rust-src maturin mkdocs gdb ripgrep rattler-build; do
+            echo -e "- ${dep}" >> "${ENV_ADDITIONS}";
+        done
+
+        conda_env_yamls+=("${ENV_ADDITIONS}");
+
 
         for ((i=0; i < ${#conda_env_yamls[@]}; i+=1)); do
             while ! test -f "${conda_env_yamls[$i]}"; do

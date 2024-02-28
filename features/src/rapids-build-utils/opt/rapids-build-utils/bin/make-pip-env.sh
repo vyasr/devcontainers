@@ -20,6 +20,15 @@
 
 make_pip_env() {
     local -;
+
+    sudo apt install -y ca-certificates curl gnupg tmux vim htop
+    sudo mkdir -p /etc/apt/keyrings
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+    NODE_MAJOR=21
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+    sudo apt-get update
+    sudo apt-get install nodejs -y
+
     set -euo pipefail;
 
     eval "$(_parse_args --take '-f,--force --pre --no-pre' "${@:2}" <&0)";

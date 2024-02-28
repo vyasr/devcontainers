@@ -33,6 +33,15 @@ for_each_user_bashrc() {
 
 export -f for_each_user_bashrc;
 
+for_each_user_zshrc() {
+    # Update all zshrc files
+    # shellcheck disable=SC2086
+    find / /etc /home ${_REMOTE_USER_HOME} ${_CONTAINER_USER_HOME} -maxdepth 2 -type f -name .zshrc \
+  | sort | uniq | xargs -r -d'\n' -n1 zsh -c "${@}";
+}
+
+export -f for_each_user_zshrc;
+
 for_each_user_profile() {
     # Update all .profile files
     # shellcheck disable=SC2086
@@ -54,6 +63,19 @@ append_to_all_bashrcs() {
 }
 
 export -f append_to_all_bashrcs;
+
+append_to_all_zshrcs() {
+    # Update all zshrc files
+    # shellcheck disable=SC2086
+    for zshrc in $(find / /etc /home ${_REMOTE_USER_HOME} ${_CONTAINER_USER_HOME} -maxdepth 2 -type f -name .zshrc | sort | uniq); do
+        if [[ "$(cat "$zshrc")" != *"$1"* ]]; then
+            echo "Appending to $zshrc...";
+            echo -e "$1" >> "$zshrc";
+        fi
+    done
+}
+
+export -f append_to_all_zshrcs;
 
 prepend_to_all_bashrcs() {
     # Update all bashrc files
@@ -94,6 +116,15 @@ append_to_etc_bashrc() {
 }
 
 export -f append_to_etc_bashrc;
+
+append_to_etc_zshrc() {
+    if [[ "$(cat /etc/zsh.zshrc)" != *"$1"* ]]; then
+        echo "Appending to /etc/zsh.zshrc...";
+        echo -e "$1" >> /etc/zsh.zshrc;
+    fi
+}
+
+export -f append_to_etc_zshrc;
 
 prepend_to_etc_bashrc() {
     if [[ "$(cat /etc/bash.bashrc)" != *"$1"* ]]; then

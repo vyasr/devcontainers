@@ -13,8 +13,13 @@
     "--name",
     "${localEnv:USER:anon}-rapids-${localWorkspaceFolderBasename}-25.04-cuda12.8-conda"
   ],
+  "containerEnv": {
+      "TERM": "${localEnv:TERM}",
+      "SSH_AUTH_SOCK": "/tmp/original_auth_sock"
+  },
   "hostRequirements": {"gpu": "optional"},
   "features": {
+    "./features/src/local-mods": {},
     "./features/src/cuda": {
       "version": "12.8",
       "installCompilers": false,
@@ -41,6 +46,7 @@
     "./features/src/rapids-build-utils": {}
   },
   "overrideFeatureInstallOrder": [
+    "./features/src/local-mods",
     "./features/src/cuda",
     "./features/src/utils",
     "./features/src/rapids-build-utils"

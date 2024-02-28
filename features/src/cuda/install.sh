@@ -261,6 +261,8 @@ printf -v vars_ '%s,' "${vars_[@]}";
 # export envvars in bashrc files
 append_to_etc_bashrc "$(cat .bashrc | envsubst "${vars_%,}")";
 append_to_all_bashrcs "$(cat .bashrc | envsubst "${vars_%,}")";
+append_to_etc_zshrc "$(cat .zshrc | envsubst "${vars_%,}")";
+append_to_all_zshrcs "$(cat .zshrc | envsubst "${vars_%,}")";
 # export envvars in /etc/profile.d
 add_etc_profile_d_script cuda "$(cat .bashrc | envsubst "${vars_%,}")";
 
