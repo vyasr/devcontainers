@@ -53,8 +53,6 @@ jobs:
         # Cython itself to work under the limited API.
         export NO_CYTHON_COMPILE=true
         python -m pip install git+https://github.com/cython/cython.git@limited-api-preview
-        # Need to install my branch of scikit-build-core for the way I'm specifying CMAKE_CXX_FLAGS via CMAKE_ARGS to work
-        python -m pip install git+https://github.com/vyasr/scikit-build-core.git@fix/cmake_args_quoted_spaces
 
         build-all                        \
           -v                             \
