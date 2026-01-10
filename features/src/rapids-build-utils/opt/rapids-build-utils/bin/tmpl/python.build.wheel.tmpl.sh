@@ -29,6 +29,26 @@ build_${PY_LIB}_python_wheel() {
 
     local py_lib="${PY_LIB}";
 
+    # Initialize runtime variable from template-substituted value
+    local py_src="${PY_SRC}";
+
+    # Adjust py_src if running from a git worktree
+    if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        # Get the actual worktree root (current working directory's git root)
+        local worktree_root="$(git rev-parse --show-toplevel)"
+
+        # Calculate relative path from SRC_PATH to py_src
+        # Example: SRC_PATH=~/rmm, py_src=~/rmm/python/librmm -> relative=python/librmm
+        local relative_path="${py_src#${SRC_PATH}}"
+        relative_path="${relative_path#/}"  # Remove leading slash if present
+
+        # Check if cwd's worktree root differs from SRC_PATH
+        # If different, we're in a worktree and need to adjust py_src
+        if [[ "${worktree_root}" != "${SRC_PATH}" ]]; then
+            py_src="${worktree_root}/${relative_path}"
+        fi
+    fi
+
     local -a cmake_args_="(${CMAKE_ARGS:-})";
     cmake_args_+=(${CPP_CMAKE_ARGS});
 
@@ -36,8 +56,8 @@ build_${PY_LIB}_python_wheel() {
 
     eval "$(_parse_args --take '-G -v,--verbose' "$@" "${cmake_args_[@]}" "${pip_args_[@]}" <&0)";
 
-    if [[ ! -d "${PY_SRC}" ]]; then
-        echo "build-${PY_LIB}-python-wheel: cannot access '${PY_SRC}': No such directory" >&2;
+    if [[ ! -d "${py_src}" ]]; then
+        echo "build-${PY_LIB}-python-wheel: cannot access '${py_src}': No such directory" >&2;
         exit 1;
     fi
 
@@ -67,16 +87,16 @@ build_${PY_LIB}_python_wheel() {
         $(rapids-select-pip-wheel-args "$@")
     )";
 
-    if rapids-python-uses-scikit-build "${PY_SRC}"; then
+    if rapids-python-uses-scikit-build "${py_src}"; then
         # Clean the `_skbuild/.../cmake-build` dir if configuration failed before
-        if ! test -d "$(rapids-maybe-clean-build-dir "${cmake_args[@]}" -- "${PY_SRC}")"; then
-            rm -rf "${PY_SRC}/_skbuild";
+        if ! test -d "$(rapids-maybe-clean-build-dir "${cmake_args[@]}" -- "${py_src}")"; then
+            rm -rf "${py_src}/_skbuild";
         fi
-    elif rapids-python-uses-scikit-build-core "${PY_SRC}"; then
-        pip_args+=(-C "build-dir=$(rapids-maybe-clean-build-dir "${cmake_args[@]}" -- "${PY_SRC}")");
+    elif rapids-python-uses-scikit-build-core "${py_src}"; then
+        pip_args+=(-C "build-dir=$(rapids-maybe-clean-build-dir "${cmake_args[@]}" -- "${py_src}")");
     fi
 
-    pip_args+=("${PY_SRC}");
+    pip_args+=("${py_src}");
 
     # Ensure SCCACHE_NO_DIST_COMPILE=1 is set while configuring
     # so CMake's compiler tests never use the build cluster.
@@ -95,7 +115,7 @@ EOF
     # Join with semicolons
     cmake_args+=("-DCMAKE_PROJECT_INCLUDE_BEFORE=$(IFS=";"; echo "${cmake_project_include_before[*]}")")
 
-    trap "rm -rf '${PY_SRC}/${py_lib//"-"/"_"}.egg-info'" EXIT;
+    trap "rm -rf '${py_src}/${py_lib//"-"/"_"}.egg-info'" EXIT;
 
     time (
         echo "Building ${PY_LIB} wheel";

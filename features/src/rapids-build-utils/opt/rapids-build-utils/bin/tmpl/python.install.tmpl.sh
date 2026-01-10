@@ -29,6 +29,26 @@ install_${PY_LIB}_python() {
 
     local py_lib="${PY_LIB}";
 
+    # Initialize runtime variable from template-substituted value
+    local py_src="${PY_SRC}";
+
+    # Adjust py_src if running from a git worktree
+    if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        # Get the actual worktree root (current working directory's git root)
+        local worktree_root="$(git rev-parse --show-toplevel)"
+
+        # Calculate relative path from SRC_PATH to py_src
+        # Example: SRC_PATH=~/rmm, py_src=~/rmm/python/librmm -> relative=python/librmm
+        local relative_path="${py_src#${SRC_PATH}}"
+        relative_path="${relative_path#/}"  # Remove leading slash if present
+
+        # Check if cwd's worktree root differs from SRC_PATH
+        # If different, we're in a worktree and need to adjust py_src
+        if [[ "${worktree_root}" != "${SRC_PATH}" ]]; then
+            py_src="${worktree_root}/${relative_path}"
+        fi
+    fi
+
     local -a cmake_args_="(${CMAKE_ARGS:-})";
     cmake_args_+=(${CPP_CMAKE_ARGS});
 
@@ -36,8 +56,8 @@ install_${PY_LIB}_python() {
 
     eval "$(_parse_args --take '-G -e,--editable -j,--parallel -v,--verbose' "$@" "${cmake_args_[@]}" "${pip_args_[@]}" <&0)";
 
-    if [[ ! -d "${PY_SRC}" ]]; then
-        echo "install-${PY_LIB}-python: cannot access '${PY_SRC}': No such directory" >&2;
+    if [[ ! -d "${py_src}" ]]; then
+        echo "install-${PY_LIB}-python: cannot access '${py_src}': No such directory" >&2;
         exit 1;
     fi
 
@@ -65,16 +85,16 @@ install_${PY_LIB}_python() {
         $(rapids-select-pip-install-args "$@")
     )";
 
-    if rapids-python-uses-scikit-build "${PY_SRC}"; then
+    if rapids-python-uses-scikit-build "${py_src}"; then
         # Clean the `_skbuild/.../cmake-build` dir if configuration failed before
-        if ! test -d "$(rapids-maybe-clean-build-dir "${cmake_args[@]}" -- "${PY_SRC}")"; then
-            rm -rf "${PY_SRC}/_skbuild";
+        if ! test -d "$(rapids-maybe-clean-build-dir "${cmake_args[@]}" -- "${py_src}")"; then
+            rm -rf "${py_src}/_skbuild";
         fi
         if test ${#editable[@]} -gt 0; then
             export SETUPTOOLS_ENABLE_FEATURES=legacy-editable;
         fi
-    elif rapids-python-uses-scikit-build-core "${PY_SRC}"; then
-        pip_args+=(-C "build-dir=$(rapids-maybe-clean-build-dir "${cmake_args[@]}" -- "${PY_SRC}")");
+    elif rapids-python-uses-scikit-build-core "${py_src}"; then
+        pip_args+=(-C "build-dir=$(rapids-maybe-clean-build-dir "${cmake_args[@]}" -- "${py_src}")");
     fi
 
     # Put --editable at the end of pip_args
@@ -91,9 +111,9 @@ install_${PY_LIB}_python() {
                     ;;
             esac
         done
-        pip_args+=(--editable "${editable:-${PY_SRC}}");
+        pip_args+=(--editable "${editable:-${py_src}}");
     else
-        pip_args+=("${PY_SRC}");
+        pip_args+=("${py_src}");
     fi
 
     # Ensure SCCACHE_NO_DIST_COMPILE=1 is set while configuring
@@ -113,7 +133,7 @@ EOF
     # Join with semicolons
     cmake_args+=("-DCMAKE_PROJECT_INCLUDE_BEFORE=$(IFS=";"; echo "${cmake_project_include_before[*]}")")
 
-    trap "rm -rf '${PY_SRC}/${py_lib//"-"/"_"}.egg-info'" EXIT;
+    trap "rm -rf '${py_src}/${py_lib//"-"/"_"}.egg-info'" EXIT;
 
     time (
         echo "Installing ${PY_LIB}";
