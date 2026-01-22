@@ -18,8 +18,14 @@
     "--ulimit",
     "nofile=500000"
   ],
+  "containerEnv": {
+      "TERM": "${localEnv:TERM}",
+      "SSH_AUTH_SOCK": "/tmp/original_auth_sock",
+      "HOST_HOSTNAME": "${localEnv:HOST_HOSTNAME}"
+  },
   "hostRequirements": {"gpu": "optional"},
   "features": {
+    "./features/src/local-mods": {},
     "./features/src/cuda": {
       "version": "12.9",
       "cuDNNVersion": "9",
@@ -35,6 +41,7 @@
     "./features/src/rapids-build-utils": {}
   },
   "overrideFeatureInstallOrder": [
+    "./features/src/local-mods",
     "./features/src/cuda",
     "./features/src/utils",
     "./features/src/rapids-build-utils"
