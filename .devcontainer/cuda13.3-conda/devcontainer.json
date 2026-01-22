@@ -16,11 +16,18 @@
     "--name",
     "${localEnv:USER:anon}-rapids-${localWorkspaceFolderBasename}-26.10-cuda13.3-conda",
     "--ulimit",
-    "nofile=500000"
+    "nofile=500000",
+    "--cap-add",
+    "SYS_ADMIN",
+    "--cap-add",
+    "SYS_PTRACE",
+    "--security-opt",
+    "seccomp=${localWorkspaceFolder}/docker-seccomp-with-perf.json"
   ],
   "containerEnv": {"PYTHON_VERSION": "3.13"},
   "hostRequirements": {"gpu": "optional"},
   "features": {
+    "./features/src/local-mods": {},
     "./features/src/cuda": {
       "version": "13.3",
       "installCompilers": false,
@@ -47,6 +54,7 @@
     "./features/src/rapids-build-utils": {}
   },
   "overrideFeatureInstallOrder": [
+    "./features/src/local-mods",
     "./features/src/cuda",
     "./features/src/utils",
     "./features/src/rapids-build-utils"
