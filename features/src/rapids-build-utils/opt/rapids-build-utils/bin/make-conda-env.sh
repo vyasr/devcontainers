@@ -55,7 +55,7 @@ make_conda_env() {
             echo "";
 
             mamba env create "${q[@]}" -n "${env_name}" -f "${new_env_path}";
-            npm install -g @anthropic-ai/claude-code
+            curl -fsSL https://claude.ai/install.sh | bash
         # If the conda env does exist but it's different from the generated one,
         # print the diff between the envs and update it
         elif ! diff -BNqw "${old_env_path}" "${new_env_path}" >/dev/null 2>&1; then
@@ -75,7 +75,7 @@ make_conda_env() {
             rm -rf "${HOME}/.conda/envs/${env_name}";
 
             mamba env create "${q[@]}" -n "${env_name}" -f "${new_env_path}";
-            npm install -g @anthropic-ai/claude-code
+            curl -fsSL https://claude.ai/install.sh | bash
         fi
 
         cp -a "${new_env_path}" "${old_env_path}";
