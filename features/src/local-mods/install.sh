@@ -14,6 +14,8 @@ ln -s ${dotfiles}/inputrc ${home}/.inputrc
 ln -s ${dotfiles}/vimrc ${home}/.vimrc
 mkdir -p ${home}/.config/nvim
 ln -s ${dotfiles}/init.lua ${home}/.config/nvim/init.lua
+mkdir -p ${home}/.claude
+ln -s ${dotfiles}/claude-settings.json ${home}/.claude/settings.json
 ln -s ${claude_files_dir}/devcontainers/root/CLAUDE.md ${home}/CLAUDE.md
 # Loop over directories ${dir} in ${home} and check if they are nonempty. If so, see if a corresponding directory exists in ${claude_files_dir}/devcontainers/${dir}. If there is one and it has a CLAUDE.md file, symlink that file into the ${home} directory as ${dir}/CLAUDE.md
 for dir in ${home}/*; do
