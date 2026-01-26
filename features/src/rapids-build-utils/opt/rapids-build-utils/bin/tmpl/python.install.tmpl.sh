@@ -45,7 +45,21 @@ install_${PY_LIB}_python() {
         # Check if cwd's worktree root differs from SRC_PATH
         # If different, we're in a worktree and need to adjust py_src
         if [[ "${worktree_root}" != "${SRC_PATH}" ]]; then
-            py_src="${worktree_root}/${relative_path}"
+            # Verify both paths are in the same repository by comparing git common dirs
+            local src_git_common_dir="$(git -C "${SRC_PATH}" rev-parse --git-common-dir 2>/dev/null || true)"
+            local worktree_git_common_dir="$(git rev-parse --git-common-dir 2>/dev/null || true)"
+
+            # Only adjust py_src if we can verify both are from the same repository
+            if [[ -n "${src_git_common_dir}" ]] && [[ -n "${worktree_git_common_dir}" ]]; then
+                # Resolve to absolute paths for comparison
+                src_git_common_dir="$(cd "${SRC_PATH}" && cd "${src_git_common_dir}" && pwd)"
+                worktree_git_common_dir="$(cd "${worktree_git_common_dir}" && pwd)"
+
+                # Only adjust py_src if worktree is from the same repository
+                if [[ "${src_git_common_dir}" == "${worktree_git_common_dir}" ]]; then
+                    py_src="${worktree_root}/${relative_path}"
+                fi
+            fi
         fi
     fi
 
