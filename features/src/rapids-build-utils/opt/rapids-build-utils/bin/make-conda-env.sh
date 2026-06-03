@@ -26,6 +26,26 @@ install_opencode() {
     ${INSTALL_FILE}
 }
 
+install_leanctx() {
+    # Helper for lean-ctx installation that works around curl needing
+    # authorization for the install script to query for available versions.
+    INSTALL_FILE="/tmp/install_leanctx.sh"
+    curl -fsSL https://leanctx.com/install.sh > "${INSTALL_FILE}"
+    chmod 0744 "${INSTALL_FILE}"
+    sed -i '/releases/s/curl/curl -H "Authorization: Bearer $(gh auth token)"/' "${INSTALL_FILE}"
+    ${INSTALL_FILE}
+}
+
+install_rtk() {
+    # Helper for rtk installation that works around curl needing
+    # authorization for the install script to query for available versions.
+    INSTALL_FILE="/tmp/install_rtk.sh"
+    curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh > "${INSTALL_FILE}"
+    chmod 0744 "${INSTALL_FILE}"
+    sed -i '/releases/s/curl/curl -H "Authorization: Bearer $(gh auth token)"/' "${INSTALL_FILE}"
+    ${INSTALL_FILE}
+}
+
 make_conda_env() {
     local -;
     set -euo pipefail;
@@ -67,6 +87,8 @@ make_conda_env() {
             mamba env create "${q[@]}" -n "${env_name}" -f "${new_env_path}";
             curl -fsSL https://claude.ai/install.sh | bash
             install_opencode
+            install_leanctx
+            install_rtk
         # If the conda env does exist but it's different from the generated one,
         # print the diff between the envs and update it
         elif ! diff -BNqw "${old_env_path}" "${new_env_path}" >/dev/null 2>&1; then
@@ -88,6 +110,8 @@ make_conda_env() {
             mamba env create "${q[@]}" -n "${env_name}" -f "${new_env_path}";
             curl -fsSL https://claude.ai/install.sh | bash
             install_opencode
+            install_leanctx
+            install_rtk
         fi
 
         cp -a "${new_env_path}" "${old_env_path}";
