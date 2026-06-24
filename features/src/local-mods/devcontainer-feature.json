@@ -29,6 +29,7 @@
     "source=${localWorkspaceFolder}/.lvimrc,target=/home/coder/.lvimrc,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/.zshrc,target=/home/coder/.zshrc,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.claude,target=/home/coder/.claude,type=bind,consistency=consistent",
-    "source=${localWorkspaceFolder}/../.opencode,target=/home/coder/.opencode,type=bind,consistency=consistent"
+    "source=${localWorkspaceFolder}/../.opencode,target=/home/coder/.opencode,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/../.local,target=/home/coder/.local,type=bind,consistency=consistent"
   ]
 }
