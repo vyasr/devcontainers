@@ -15,15 +15,21 @@ ln -s ${dotfiles}/vimrc ${home}/.vimrc
 mkdir -p ${home}/.config/nvim
 ln -s ${dotfiles}/init.lua ${home}/.config/nvim/init.lua
 mkdir -p ${home}/.claude
-ln -s ${dotfiles}/claude-settings.json ${home}/.claude/settings.json
-ln -s ${claude_files_dir}/devcontainers/root/CLAUDE.md ${home}/CLAUDE.md
-# Loop over directories ${dir} in ${home} and check if they are nonempty. If so, see if a corresponding directory exists in ${claude_files_dir}/devcontainers/${dir}. If there is one and it has a CLAUDE.md file, symlink that file into the ${home} directory as ${dir}/CLAUDE.md
+ln -sf ${dotfiles}/claude-settings.json ${home}/.claude/settings.json
+
+# Global rules: symlink root AGENTS.md to both OpenCode and Claude Code global locations
+mkdir -p ${home}/.config/opencode
+ln -sf ${claude_files_dir}/devcontainers/root/AGENTS.md ${home}/.config/opencode/AGENTS.md
+ln -sf ${claude_files_dir}/devcontainers/root/AGENTS.md ${home}/.claude/CLAUDE.md
+
+# Project-level rules: symlink AGENTS.md into project dirs, with CLAUDE.md compat
 for dir in ${home}/*; do
     if [ -d "$dir" ] && [ "$(ls -A $dir)" ]; then
         base_dir=$(basename "$dir")
-        claude_md="${claude_files_dir}/devcontainers/${base_dir}/CLAUDE.md"
-        if [ -f "$claude_md" ]; then
-            ln -s "$claude_md" "${dir}/CLAUDE.md"
+        agents_md="${claude_files_dir}/devcontainers/${base_dir}/AGENTS.md"
+        if [ -f "$agents_md" ]; then
+            ln -sf "$agents_md" "${dir}/AGENTS.md"
+            ln -sf "AGENTS.md" "${dir}/CLAUDE.md"
         fi
     fi
 done
