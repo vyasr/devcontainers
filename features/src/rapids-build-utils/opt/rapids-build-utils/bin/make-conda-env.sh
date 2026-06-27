@@ -34,6 +34,7 @@ install_leanctx() {
     chmod 0744 "${INSTALL_FILE}"
     sed -i '/releases/s/curl/curl -H "Authorization: Bearer $(gh auth token)"/' "${INSTALL_FILE}"
     ${INSTALL_FILE}
+    ${HOME}/.local/bin/lean-ctx onboard
 }
 
 install_rtk() {
@@ -44,6 +45,7 @@ install_rtk() {
     chmod 0744 "${INSTALL_FILE}"
     sed -i '/releases/s/curl/curl -H "Authorization: Bearer $(gh auth token)"/' "${INSTALL_FILE}"
     ${INSTALL_FILE}
+    ${HOME}/.local/bin/rtk init -g --opencode
 }
 
 make_conda_env() {
