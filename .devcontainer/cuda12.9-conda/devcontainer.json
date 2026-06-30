@@ -19,6 +19,8 @@
     "nofile=500000",
     "-p",
     "8888:8888",
+    "--add-host",
+    "host.docker.internal:host-gateway",
     "--cap-add",
     "SYS_ADMIN",
     "--cap-add",
