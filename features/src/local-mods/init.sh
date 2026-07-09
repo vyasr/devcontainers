@@ -4,8 +4,8 @@
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
 echo ${PWD}
-for dir in .vim .local .cache local; do
-    mkdir ../../../../${dir}
+for dir in .vim .local .cache local .local/share/opencode .local/state/opencode .local/share/oh-my-opencode .local/share/claude; do
+    mkdir -p ../../../../${dir}
 done
 
 # Also copy over fzf files since we mount them

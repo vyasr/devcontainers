@@ -30,6 +30,10 @@
     "source=${localWorkspaceFolder}/.zshrc,target=/home/coder/.zshrc,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.claude,target=/home/coder/.claude,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.opencode,target=/home/coder/.opencode,type=bind,consistency=consistent",
-    "source=${localWorkspaceFolder}/../.local,target=/home/coder/.local,type=bind,consistency=consistent"
+    "source=${localWorkspaceFolder}/../.local/share/opencode,target=/home/coder/.local/share/opencode,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/../.local/state/opencode,target=/home/coder/.local/state/opencode,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/../.local/share/oh-my-opencode,target=/home/coder/.local/share/oh-my-opencode,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/../.local/share/claude,target=/home/coder/.local/share/claude,type=bind,consistency=consistent",
+    "source=/raid/rapidsmpf/data,target=/home/coder/data,type=bind,consistency=consistent"
   ]
 }
