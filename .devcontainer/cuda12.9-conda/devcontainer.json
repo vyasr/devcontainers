@@ -29,7 +29,7 @@
     "seccomp=${localWorkspaceFolder}/docker-seccomp-with-perf.json"
   ],
   "containerEnv": {
-      "PYTHON_VERSION": "3.13",
+      "PYTHON_VERSION": "3.14",
       "TERM": "${localEnv:TERM}",
       "SSH_AUTH_SOCK": "/tmp/original_auth_sock",
       "HOST_HOSTNAME": "${localEnv:HOST_HOSTNAME}"
